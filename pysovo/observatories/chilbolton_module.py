@@ -26,7 +26,8 @@ chilbolton.default_action = "NONE"
 chilbolton.default_requester = ps.address_book.rene
 
 ### Function that returns True if the facility is available, otherwise False
-chilbolton.check_available = lambda : False
+#chilbolton.check_available = lambda : False
+chilbolton.check_available = fast_triggering.check_available
 
 
 
