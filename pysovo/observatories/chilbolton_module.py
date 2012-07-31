@@ -18,12 +18,12 @@ chilbolton = Observatory(lat = 51.145762,
                   tz = 0,
                   name = "LOFAR-UK (Chilbolton station)",
                   short_name = "Chilbolton",
-                  email_address = ps.address_book.chilbolton.email,
+                  email_address = [contact.email for contact in ps.address_book.chilbolton_list]
                   )
 
 ### Attributes specific to this particular site:
 chilbolton.default_action = "NONE"
-chilbolton.default_requester = ps.address_book.chilbolton_requesters['rene']
+chilbolton.default_requester = ps.address_book.rene
 
 ### Function that returns True if the facility is available, otherwise False
 chilbolton.check_available = lambda : False
