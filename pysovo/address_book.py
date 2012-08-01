@@ -1,1 +1,1 @@
-address_book.public.py
+../../../../.vo_alerts/live_address_book.py
