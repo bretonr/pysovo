@@ -63,7 +63,7 @@ def format_chilbolton_email_alert(target_coords, target_name, comment, action, r
 ##### Setting the script that does the triggering work
 
 ### Defining the function that gathers the trigger request information and pass it on to the Chilbolton GRB script
-def request_chilbolton_observation(target_coords, alert_type, voevent, local_config, debug=True, action=None, requester=None):
+def request_chilbolton_observation(target_coords, alert_type, voevent, local_config, duration, debug=True, action=None, requester=None):
     ## Provide some default values for optional attributes
     if action is None:
         action = chilbolton.default_action
@@ -89,7 +89,7 @@ def request_chilbolton_observation(target_coords, alert_type, voevent, local_con
     
     ## Attempts to run the triggering script if the facility is available
     if chilbolton.check_available():
-        status, msg = fast_triggering.trigger_grb_chilbolton(chilbolton, target_coords, target_name, debug=debug)
+        status, msg = fast_triggering.trigger_grb_chilbolton(chilbolton, target_coords, target_name, duration, debug=debug)
     else:
         status = 0
         msg = "    Station not available at the requested time!\n"

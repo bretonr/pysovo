@@ -21,14 +21,14 @@ class TestChilboltonModule(unittest.TestCase):
 
     def test_trigger_not_available(self):
         chilbolton.check_available = lambda : False
-        observation_text = chilbolton.request_observation(self.coords, "swift_grb", self.voevent, self.config, debug=True)
+        observation_text = chilbolton.request_observation(self.coords, "swift_grb", self.voevent, self.config, 60, debug=True)
         print("")
         print("Sample Chilbolton request body text (non-available):")
         print(observation_text)
 
     def test_trigger_available(self):
         chilbolton.check_available = lambda : True
-        observation_text = chilbolton.request_observation(self.coords, "swift_grb", self.voevent, self.config, debug=True)
+        observation_text = chilbolton.request_observation(self.coords, "swift_grb", self.voevent, self.config, 60, debug=True)
         print("")
         print("Sample Chilbolton request body text (available):")
         print(observation_text)
