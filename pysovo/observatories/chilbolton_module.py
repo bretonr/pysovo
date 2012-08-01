@@ -102,7 +102,7 @@ def request_chilbolton_observation(target_coords, alert_type, voevent, local_con
 
     ## Send the notification email
     chilbolton.internal_request_mechanism(alert_message, local_config, subject=subject)
-    return alert_message
+    return status,  alert_message
 
 ### Copying the function to a generic name
 chilbolton.request_observation = request_chilbolton_observation

@@ -16,18 +16,18 @@ class TestChilboltonModule(unittest.TestCase):
         v.set_ivorn("ivo://nasa.gsfc.gcn/SWIFT#BAT_GRB_Pos_517234-259")
         self.voevent = v
         self.coords = test_data.arbitrary_eqpos
-        self.config =  pysovo.LocalConfig(pysovo.email.load_account_settings_from_file())
+        self.local_config =  pysovo.LocalConfig(email_acount=pysovo.email.load_account_settings_from_file())
 
 #    def test_trigger_not_available(self):
 #        chilbolton.check_available = lambda : False
-#        observation_text = chilbolton.request_observation(self.coords, "swift_grb", self.voevent, self.config, 120, debug=True)
+#        status, observation_text = chilbolton.request_observation(self.coords, "swift_grb", self.voevent, self.local_config, 120, debug=True)
 #        print("")
 #        print("Sample Chilbolton request body text (non-available):")
 #        print(observation_text)
 
     def test_trigger_available(self):
         #chilbolton.check_available = lambda : True
-        observation_text = chilbolton.request_observation(self.coords, "swift_grb", self.voevent, self.config, 120, debug=False)
+        status, observation_text = chilbolton.request_observation(self.coords, "swift_grb", self.voevent, self.local_config, 120, debug=False)
         print("")
         print("Sample Chilbolton request body text (available):")
         print(observation_text)
