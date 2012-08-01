@@ -12,7 +12,6 @@ import astropysics
 class TestChilboltonModule(unittest.TestCase):
     def setUp(self):
         chilbolton.default_action = "UNITTEST"
-        #chilbolton.email_address = "r.breton@soton.ac.uk"
         v = voe.VOEvent(version="2.0")
         v.set_ivorn("ivo://nasa.gsfc.gcn/SWIFT#BAT_GRB_Pos_517234-259")
         self.voevent = v
