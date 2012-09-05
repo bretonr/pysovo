@@ -27,7 +27,7 @@ chilbolton.default_requester = ps.address_book.rene
 
 ### Function that returns True if the facility is available, otherwise False
 #chilbolton.check_available = lambda : False
-chilbolton.check_available = fast_triggering.check_available
+chilbolton.check_available = fast_triggering.check_available_chilbolton
 
 
 
@@ -64,6 +64,17 @@ def format_chilbolton_email_alert(target_coords, target_name, comment, action, r
 
 ### Defining the function that gathers the trigger request information and pass it on to the Chilbolton GRB script
 def request_chilbolton_observation(target_coords, alert_type, voevent, local_config, duration, debug=True, action=None, requester=None):
+    """request_chilbolton_observation(target_coords, alert_type, voevent, local_config, duration, debug=True, action=None, requester=None)
+    
+    >>> status, alert_message = request_chilbolton_observation(target_coords, alert_type, voevent, local_config, duration, debug=True, action=None, requester=None)
+    
+    status:
+        0: success
+        -1: station not available
+        -2: station already triggered
+        1: failure
+        2: no calibrator
+    """
     ## Provide some default values for optional attributes
     if action is None:
         action = chilbolton.default_action
@@ -82,16 +93,28 @@ def request_chilbolton_observation(target_coords, alert_type, voevent, local_con
         target_name = "SWIFT_"+alert_id
         comment = "Automated SWIFT ID "+alert_id+debug_msg
         subject = "Swift GRB Chilbolton fast triggering"+debug_msg
+    elif alert_type == ps.alert_types.fermi_grb:
+        alert_id = voevent.ivorn[len("ivo://nasa.gsfc.gcn/Fermi#GBM_Gnd_Pos_"):]
+        target_name = "FERMI_"+alert_id
+        comment = "Automated Fermi ID "+alert_id+debug_msg
+        subject = "Fermi GRB Chilbolton fast triggering"+debug_msg
     else:
         target_name = "4PISKY"
         comment = "Manual trigger"+debug_msg
         subject = "Manual Chilbolton fast triggering"+debug_msg
     
     ## Attempts to run the triggering script if the facility is available
-    if chilbolton.check_available():
+    chilbolton_status = chilbolton.check_available()
+    if chilbolton_status == 0:
         status, msg = fast_triggering.trigger_grb_chilbolton(chilbolton, target_coords, target_name, duration, debug=debug)
+    elif chilbolton_status == 1:
+        status = -1
+        msg = "    Station not available at the requested time!\n"
+    elif chilbolton_status == 2:
+        status = -2
+        msg = "    Station already in use for another trigger!\n"
     else:
-        status = 0
+        status = 1
         msg = "    Station not available at the requested time!\n"
     
     if msg is not None:
