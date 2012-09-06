@@ -5,6 +5,7 @@ from astropysics.coords.coordsys import FK5Coordinates
 from observatory import Observatory
 import LofarCtl
 import datetime
+import astropysics
 
 
 
