@@ -4,6 +4,7 @@ import pysovo.address_book as address_book
 from astropysics.coords.coordsys import FK5Coordinates 
 from observatory import Observatory
 import LofarCtl
+import datetime
 
 
 
