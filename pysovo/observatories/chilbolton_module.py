@@ -1,3 +1,4 @@
+import numpy
 import pysovo as ps 
 import pysovo.email as email
 import pysovo.address_book as address_book 
@@ -5,6 +6,7 @@ from astropysics.coords.coordsys import FK5Coordinates
 from observatory import Observatory
 import LofarCtl
 import datetime
+import pytz
 import astropysics
 
 
@@ -86,7 +88,7 @@ def process_observation(station, target_coords, target_name, duration, debug=Tru
         This is generally what will be contained in the body of a notification email.
     """
     duration = int(duration)
-    time_start = datetime.datetime.utcnow()
+    time_start = datetime.datetime.now(pytz.utc)
     time_end = astropysics.obstools.jd_to_calendar(astropysics.obstools.calendar_to_jd(time_start)+1./24)
     
     ##### #####
