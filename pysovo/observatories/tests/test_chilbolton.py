@@ -19,7 +19,7 @@ class TestChilboltonModule(unittest.TestCase):
         self.local_config =  pysovo.LocalConfig(email_account=pysovo.email.load_account_settings_from_file())
 
     def test_trigger(self):
-        status, observation_text = chilbolton.request_observation(self.coords, "swift_grb", self.voevent, self.local_config, 120, debug=True)
+        status, observation_text = chilbolton.request_observation(self.coords, "swift_grb", self.voevent, self.local_config, 120, debug=False)
         print("")
         print("Sample Chilbolton request body text (available):")
         print(observation_text)
