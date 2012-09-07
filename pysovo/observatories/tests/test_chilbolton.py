@@ -18,10 +18,18 @@ class TestChilboltonModule(unittest.TestCase):
         self.coords = test_data.arbitrary_eqpos
         self.local_config =  pysovo.LocalConfig(email_account=pysovo.email.load_account_settings_from_file())
 
-    def test_trigger(self):
+    def test_trigger_on_sky(self):
+        self.coords = test_data.equatorial_on_sky_chilbolton
         status, observation_text = chilbolton.request_observation(self.coords, "swift_grb", self.voevent, self.local_config, 120, debug=True)
         print("")
-        print("Sample Chilbolton request body text (available):")
+        print("Sample Chilbolton request body text (source on sky):")
+        print(observation_text)
+
+    def test_trigger_off_sky(self):
+        self.coords = test_data.equatorial_off_sky_chilbolton
+        status, observation_text = chilbolton.request_observation(self.coords, "swift_grb", self.voevent, self.local_config, 120, debug=True)
+        print("")
+        print("Sample Chilbolton request body text (source off sky):")
         print(observation_text)
 
 

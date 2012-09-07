@@ -26,3 +26,7 @@ southern_hemisphere = astropysics.coords.coordsys.FK5Coordinates("5:6:32 -60.0 J
 
 #---------------------------------------------------------------------------------------------------------
 arbitrary_eqpos = astropysics.coords.coordsys.FK5Coordinates("12:6:32 +45.0 J2000.0")
+
+#---------------------------------------------------------------------------------------------------------
+equatorial_on_sky_chilbolton = astropysics.coords.coordsys.FK5Coordinates("12:6:32 +45.0 J2000.0")
+equatorial_off_sky_chilbolton = astropysics.coords.coordsys.FK5Coordinates("12:6:32 -55.0 J2000.0")
