@@ -213,7 +213,7 @@ def request_chilbolton_observation(target_coords, alert_type, voevent, local_con
         comment = "Automated SWIFT ID "+alert_id+debug_msg
         subject = "Swift GRB Chilbolton fast triggering"+debug_msg
     elif alert_type == ps.alert_types.fermi_grb:
-        alert_id = voevent.ivorn[len("ivo://nasa.gsfc.gcn/Fermi#GBM_Gnd_Pos_"):]
+        alert_id = voevent.ivorn[len("ivo:,//nasa.gsfc.gcn/Fermi#GBM_Gnd_Pos_"):]
         target_name = "FERMI_"+alert_id
         comment = "Automated Fermi ID "+alert_id+debug_msg
         subject = "Fermi GRB Chilbolton fast triggering"+debug_msg
