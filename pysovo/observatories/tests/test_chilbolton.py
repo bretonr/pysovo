@@ -9,6 +9,9 @@ import test_data
 import datetime, pytz
 import astropysics
 
+###
+debug = True
+
 class TestChilboltonModule(unittest.TestCase):
     def setUp(self):
         chilbolton.default_action = "UNITTEST"
@@ -20,14 +23,14 @@ class TestChilboltonModule(unittest.TestCase):
 
     def test_trigger_on_sky(self):
         self.coords = test_data.equatorial_on_sky_chilbolton
-        status, observation_text = chilbolton.request_observation(self.coords, "swift_grb", self.voevent, self.local_config, 120, debug=True)
+        status, observation_text = chilbolton.request_observation(self.coords, "swift_grb", self.voevent, self.local_config, 120, debug=debug)
         print("")
         print("Sample Chilbolton request body text (source on sky):")
         print(observation_text)
 
     def test_trigger_off_sky(self):
         self.coords = test_data.equatorial_off_sky_chilbolton
-        status, observation_text = chilbolton.request_observation(self.coords, "swift_grb", self.voevent, self.local_config, 120, debug=True)
+        status, observation_text = chilbolton.request_observation(self.coords, "swift_grb", self.voevent, self.local_config, 120, debug=debug)
         print("")
         print("Sample Chilbolton request body text (source off sky):")
         print(observation_text)
