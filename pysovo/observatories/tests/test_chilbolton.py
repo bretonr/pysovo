@@ -9,7 +9,7 @@ import test_data
 import datetime, pytz
 import astropysics
 
-###
+### The debug flag must be modified with care. If set to True, actual commands will be sent to the station.
 debug = True
 
 class TestChilboltonModule(unittest.TestCase):
