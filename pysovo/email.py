@@ -1,3 +1,7 @@
+#pysovo VOEvent Tools
+#Tim Staley 2012
+#Based on various web snippets.
+
 import simplejson as simplejson
 import os
 import sys
@@ -6,7 +10,7 @@ import smtplib
 import quick_keys as keys
 import pysovo as ps
         
-default_email_config_file="".join((os.environ['HOME'], "/.vo_alerts/email_acc"))
+default_email_config_file = "".join((os.environ['HOME'], "/.pysovo/email_acc"))
 
         
 def prompt_for_config( config_filename = default_email_config_file ):

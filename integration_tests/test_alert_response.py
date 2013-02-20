@@ -1,27 +1,32 @@
 #!/usr/bin/python
 
 import sys
-from VOEventLib import VOEvent as voe, Vutil as voe_utils
 import functools
-import pysovo as ps
-import pysovo.observatories as obs
-import pysovo.observatories.ami_module as ami_details
-import alert_response
+#Don't import anything here - prevents proper testing of alert_response.
+#(You might temporarily fix a broken import - which then remains broken)
+from pysovo.tests.resources import datapaths
+from pysovo.observatories import ami_module
+import voeparse
+import alert_response as ar
 
 def main():
-    obs.ami.email_address = ps.address_book.test.email #Do NOT email AMI
-    obs.ami.default_action = "CHECK" #Insurance.
-    obs.ami.internal_request_mechanism = functools.partial(ami_details.email_ami, 
-                                                           subject = "[TEST] "+ami_details.request_email_subject)
-    
-    alert_response.notify_contacts =[ ps.address_book.tim  ]  # Only notify test contacts
-    alert_response.notification_email_subject = "[TEST] " + alert_response.notification_email_subject
-    
-     
-    
-    test_packet = voe_utils.parse("../test_data/BAT_GRB_Pos_517234-259.xml")
-    
-    alert_response.voevent_logic(test_packet)
-        
+    ar.obs.ami.email_address = ar.ps.address_book.test.email #Do NOT email AMI
+    ar.obs.ami.default_action = "CHECK" #And don't request an observation.
+    ar.obs.ami.internal_request_mechanism = functools.partial(
+                       ami_module.email_ami,
+                       subject="[TEST] " + ami_module.request_email_subject
+                       )
+
+    ar.notify_contacts = [ ar.ps.address_book.tim  ]  # Only notify test contacts
+    ar.notification_email_subject = "[TEST] " + ar.notification_email_subject
+
+    ar.default_archive_root = "./"
+
+
+    test_packet = voeparse.load(datapaths.swift_bat_grb_pos_v2)
+    print "Packet loaded, ivorn", test_packet.attrib['ivorn']
+
+    ar.voevent_logic(test_packet)
+
 if __name__ == "__main__":
-    main() 
+    main()

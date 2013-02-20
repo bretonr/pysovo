@@ -1,3 +1,6 @@
+#pysovo VOEvent Tools
+#Tim Staley, <timstaley337@gmail.com>, 2012
+
 import simplejson as json
 import os
 import sys
@@ -12,7 +15,7 @@ import urllib
 import quick_keys as keys
 import pysovo.utils as utils
         
-default_sms_config_file="".join((os.environ['HOME'], "/.vo_alerts/sms_acc"))
+default_sms_config_file = "".join((os.environ['HOME'], "/.pysovo/sms_acc"))
 
 try:        
     import textmagic
