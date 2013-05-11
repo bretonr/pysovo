@@ -1,3 +1,3 @@
 from ami_module import ami
-from chilbolton_module import chilbolton
-__all__ = ['ami', 'chilbolton']
+from lofarintl_module import chilbolton, nancay
+__all__ = ['ami', 'chilbolton', 'nancay']
