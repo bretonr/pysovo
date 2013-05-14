@@ -1,9 +1,8 @@
 import numpy
-import pysovo as ps 
-import pysovo.email
-import pysovo.address_book as address_book 
-from astropysics.coords.coordsys import FK5Coordinates 
-from observatory import Observatory
+from pysovo import contacts
+import pysovo as ps
+from astropysics.coords.coordsys import FK5Coordinates
+from astropysics.obstools import Site
 import LofarCtl
 import datetime
 import pytz
@@ -99,7 +98,7 @@ def internal_request_mechanism(self, target_coords, target_name, duration, debug
     if not self.on_sky(target_coords, time_start):
         print( "The source is not visible." )
         status = 2
-        msg = "    The source is not visible at the moment from the observatory!"
+        msg = "Target not visible at the moment from the facility."
         ## log - start
         logging.info( "internal_request_mechanism | visibility status: {}, msg: {}".format(status, msg) )
         ## log - end
@@ -125,9 +124,9 @@ def internal_request_mechanism(self, target_coords, target_name, duration, debug
         logging.debug( "internal_request_mechanism | choosing calibrator {} at {:.3f} degrees from the source.".format(cal.names[calibrator_id], separation[calibrator_id]) )
         ## log - end
     else:
-        print( "No calibrator is available." )
+        print( "No calibrator could be set." )
         status = 3
-        msg = "    No calibrator could be set!"
+        msg = "No calibrator could be set."
         ## log - start
         logging.info( "internal_request_mechanism | calibrator status: {}, msg: {}".format(status, msg) )
         ## log - end
@@ -185,13 +184,16 @@ def internal_request_mechanism(self, target_coords, target_name, duration, debug
     ### Status (0: good (debug=False), 1: failed (debug=True), 2: source not visible, 3: no calibrator)
     if debug:
         status = 1
+        msg = "No observation request sent; debug mode."
     else:
         status = 0
+        msg = "Observation request sent succesfully."
     
-    msg = "    Here is the setup we used:\n"
+    msg = "\n    Here is the setup we used:\n"
     msg += "        antennaset: {0}\n".format(antennaset)
     msg += "        rcumode: {0}\n".format(rcumode)
-    msg += "        calibrator: {0}".format(cal.names[calibrator_id])
+    msg += "        calibrator: {0}\n".format(cal.names[calibrator_id])
+    msg += "        duration: {0}".format(duration)
     
     ## log - start
     logging.info( "internal_request_mechanism | observation status {}".format(status) )
@@ -200,10 +202,10 @@ def internal_request_mechanism(self, target_coords, target_name, duration, debug
     return status, msg
 
 ### Defining the function that gathers the trigger request information and pass it on to the station GRB script
-def request_observation(self, target_coords, alert_type, voevent, local_config, duration, debug=True, action=None, requester=None):
-    """request_observation(self, target_coords, alert_type, voevent, local_config, duration, debug=True, action=None, requester=None)
+def request_observation(self, target_coords, target_name, duration, debug=True):
+    """request_observation(self, target_coords, target_name, duration, debug=True)
     
-    >>> status, alert_message = request_observation(station, target_coords, alert_type, voevent, local_config, duration, debug=True, action=None, requester=None)
+    >>> status, alert_message = request_observation(station, target_coords, target_name, duration, debug=True)
     
     status:
         -1: station not available
@@ -213,50 +215,10 @@ def request_observation(self, target_coords, alert_type, voevent, local_config, 
         2: source not visible
         3: no calibrator
     """
-    ## Provide some default values for optional attributes
-    if action is None:
-        action = self.default_action
-    if requester is None:
-        requester = self.default_requester
-    
-    ## If debug mode requested, format a special message
-    if debug:
-        debug_msg = " (DEBUG Mode)"
-    else:
-        debug_msg = ""
-
-    ## Determine the type of alert and the appropriate attribute formatting
-    if alert_type == ps.alert_types.swift_grb:
-        alert_id = voevent.ivorn[len("ivo://nasa.gsfc.gcn/SWIFT#BAT_GRB_Pos_"):]
-        target_name = "SWIFT_"+alert_id
-        comment = "Automated SWIFT ID "+alert_id+debug_msg
-        subject = "Swift fast triggering at {}".format(self.short_name)+debug_msg
-    elif alert_type == ps.alert_types.fermi_grb:
-        alert_id = voevent.ivorn[len("ivo:,//nasa.gsfc.gcn/Fermi#GBM_Gnd_Pos_"):]
-        target_name = "FERMI_"+alert_id
-        comment = "Automated Fermi ID "+alert_id+debug_msg
-        subject = "Fermi fast triggering at {}".format(self.short_name)+debug_msg
-    elif alert_type == ps.alert_type.xray_solar:
-        alert_id = 'xray_solar'
-        target_name = "SOLAR_"+alert_id
-        comment = "Automated X-ray solar flare ID "+alert_id+debug_msg
-        subject = "Solar flare fast triggering at {}".format(self.short_name)+debug_msg
-    else:
-        target_name = "4PISKY"
-        comment = "Manual trigger"+debug_msg
-        subject = "Manual fast triggering at {}".format(self.short_name)+debug_msg
-    
     ## Triggering the observation request
     status, msg = self.internal_request_mechanism(target_coords, target_name, duration, debug=debug)
-    
-    if msg is not None:
-        comment += "\n" + msg +"\n"
+    alert_message = msg
 
-    ## Formatting the notification email body
-    alert_message = format_email_alert(target_coords, target_name, comment, action, requester)
-
-    ## Send the notification email
-    self.notification_email(alert_message, local_config, subject)
     return status,  alert_message
 
 
@@ -267,50 +229,37 @@ def request_observation(self, target_coords, alert_type, voevent, local_config, 
 ##### Setting up the observatories
 
 ##### Defining a subclass of Observatory
-class LofarIntl(Observatory):
-    def __init__(*args, **kwargs):
-        Observatory.__init__(*args, **kwargs)
+class LofarIntl(Site):
+    def __init__(self, lat, long, alt=0., tz=None, name=None, target_min_elevation=0.):
+        super(LofarIntl, self ).__init__(lat, long, alt=alt, tz=tz, name=name)
+        self.target_min_elevation = target_min_elevation
+        ## Attaching the request_observation method
         self.request_observation = request_observation
+        ## Attaching the internal_request_mechanism method
         self.internal_request_mechanism = internal_request_mechanism
 
     def notification_email(self, alert_message, local_config, subject):
-        ps.email.send_email(account=local_config.email_account, recipient_addresses=self.email_address, subject=subject, body_text=alert_message, verbose=True)
+        ps.comms.email.send_email(account=local_config.email_account, recipient_addresses=self.email_address, subject=subject, body_text=alert_message, verbose=True)
 
 
 ##### Chilbolton
 ### Defining the observatory setup
-chilbolton = LofarIntl(lat = 51.145762,
-                  long = -1.428495,
-                  site_altitude = 78,
-                  target_min_elevation = 10,
-                  tz = 0,
-                  name = "LOFAR-UK (Chilbolton station)",
-                  short_name = "Chilbolton",
-                  email_address = [contact.email for contact in ps.address_book.chilbolton_list]
-                  )
+chilbolton = LofarIntl(51.145762, -1.428495, alt=78., target_min_elevation=10., tz=0, name="LOFAR-UK (Chilbolton station)")
 
 ### Attributes specific to this particular site:
 chilbolton.default_action = "NONE"
-chilbolton.default_requester = ps.address_book.rene
+chilbolton.default_requester = ps.contacts['rene']
 ### Function that returns True if the facility is available, otherwise False
 chilbolton.check_available = LofarCtl.scripts.fast_triggering.check_available_chilbolton
 
 
 ##### Nancay
 ### Defining the observatory setup
-nancay = LofarIntl(lat = '+47:23:00',
-                  long = '02:12:00',
-                  site_altitude = 10,
-                  target_min_elevation = 10,
-                  tz = 1,
-                  name = "LOFAR-FR (Nancay station)",
-                  short_name = "Nancay",
-                  email_address = [contact.email for contact in ps.address_book.nancay_list]
-                  )
+nancay = LofarIntl('+47:23:00', '02:12:00', alt=10., target_min_elevation=10., tz=1, name="LOFAR-FR (Nancay station)")
 
 ### Attributes specific to this particular site:
 nancay.default_action = "NONE"
-nancay.default_requester = ps.address_book.rene
+nancay.default_requester = ps.contacts['rene']
 ### Function that returns True if the facility is available, otherwise False
 nancay.check_available = LofarCtl.scripts.fast_triggering.check_available_nancay
 

@@ -15,6 +15,7 @@ import pysovo.notify
 
 try:
     contacts_file = os.path.join(config_folder, 'contacts.json')
+    print( contacts_file )
     with open(contacts_file) as f:
         contacts = json.load(f)
     logger.debug('Contacts loaded from ' + contacts_file)
